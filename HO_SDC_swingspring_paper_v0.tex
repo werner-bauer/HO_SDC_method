@@ -238,7 +238,7 @@ In \cite{Bauer22} we suggested a method that allowed us to obtain highly accurat
 
 We start with a suitable formulation of the HO phase averaged equations, namely from the averaged equation as in \eqref{equ_gen_V_int}. As suggested in my paper \cite{Bauer22}, we parameterize the dependency of the parameter $s$ around $s = 0$ by selecting a basis to represent this dependency and then project \eqref{equ_gen_V_int} onto it.
 To this end, consider a $(2N+1)$-dim space spanned by the \emph{exponential basis} $\phi_k(s) = e^{k\opL s},  \inred{j = -N,...N}$, which allows us to expand the trial and test functions as
-\begin{equation}
+\begin{equation}\label{exp_basis}
 \V(t,s) = \sum_{k = -N}^N \phi_k(s)\V_k(t) = e^{k\opL s} \V_k(t)
 \end{equation}
 and
@@ -757,6 +757,87 @@ How does the swinging spring look like in this form of HO averaged equations?
  
  
 \bigskip
+
+
+\black
+
+
+\section{Numerical results}
+
+The aim of this section is twofold. First, we investigate the use of the exponential basis to represent the phase dependency of the HO phase averaged form ??? and then we explore the SDC time method for the HO form with respect to preserving accuracy through higher order correction terms also for very large time steps.
+
+\subsection{Investigation of the exponential basis}
+
+
+Background on the use of odeint to set up and ideal environment for testing the impact of the higher order phase correction terms on the accuracy of the solutions relative to a filter reference solutions:
+\begin{itemize}
+ \item Idealized setup by using ODEint with adaptive time stepper to obtain accurate solution. Note: there is the sampling step, which is the interval in which the integrator returns results to you. This is controlled by you and usually you will select this equidistantly. And, there is the integration step, which is the discretization of time used by the integration algorithm. This is automatically adjusted to ensure that the (estimated) integration error agrees with the user defined error tolerances.
+
+\item A comparison of phase averaged and original solutions requires us to filter (or smooth) the latter one, as it features the high frequency oscillations we want to get rid of in first place by using phase averaged equations. As it turns out, by choosing a large enough sampling step size serves as such filter, while the odeint solves then with the chosen accuracy relative to those sample points. \checkit{ADD Figure of this to explain what it means!!!}
+
+In more details, when choosing for the given problem a sample size of $dt = 1$ with accuracy of about $1e-10$ for both atol and rtol, the integration step size is approximately $0.01$, but the solver returns a smoothed solutions where the fast oscillations are eliminated. In contrast, choosing a sampling of $dt = 0.01$ entails an integration time of again approximately $0.01$ but now, the higher oscillations are present.
+
+\item This fact allows us to set up the following experiment. We compare the HO phase averaged soln. with the reference solution for a sampling step of $dt = 1$, hence a filtered reference solution. We also integrate the HO phase averaged ODE with same sampling step of $dt =1$ and same tolerance rtol and atol. Because ref is smoothed, the HO phase averaged with large averaging window $T>1dt$ will produce also solutions that do not have the high frequencies, hence we need the reference solution to be smoothed to obtain a high agreement between reference and HO solutions.
+
+\item Further, because we integrate both HO phase averaged model and reference model with exactly the same time stepping method for the same accuracy and same sampling points and sampling steps, any difference between the solution should arise through the differences in the ODEs itself, not the time integration of those.
+
+\item Also, errors that might result from using a large sampling step and the entailed smoothing (see figure), because we use the same time integration for both ODEs, this error would occur in both cases in the same way as we use the same sampling step size for both.
+
+
+\todo{ADD FIGURE HERE about small and large sampling step of reference and some HO solutions.}
+
+
+
+\end{itemize}
+
+The experiment to test the accuracy of the HO form of the ODE:
+\begin{itemize}
+ \item We compute 2D error maps showing the relative time integrated L2 error between the reference solutions for sampling points $dt = 1$ and the HO soln also sampled at $dt =1$. For both ODE solvers, we have chosen rtol and atol to be 1e-10 in case 1 and 1e-13 in case 2
+%  \checkit{ADD FIGURES}.
+%  \checkit{Add l2 for x, y, z separately, but maybe combine them into one maximum error?}
+
+\item The error is computed as follows.
+\todo{ADD formula for time integrated L2 error}
+
+
+
+ \item Figure~\ref{fig_error_maps_odeint} shows the time integrated relative L2 error between reference and HO solutions for values of various values of $N$ and $T$ for two solver tolerances. We see that for the suggested setup, the HO ode formulation converges almost up to the given time integrator solver tolerance, for the first row of solver tolerance $atol = rtol = 1e-10$ up to an error of about $1e-09$ and for the second row with $atol = rtol = 1e-13$ up to an error of about $1e-11$. In contrast to the results of \cite{Bauer22}, the use of the novel exponential basis does not show a dependency of this error of the choosen averaging window $T$, so here we can have larger $T$ (we also tested values larger than those shown, up to about 50).
+
+\begin{figure}[h]\centering
+\begin{tabular}{ccc}
+ \includegraphics[scale=0.35]{figures/Figure_1.png} &
+ \includegraphics[scale=0.35]{figures/Figure_2.png} &
+ \includegraphics[scale=0.35]{figures/Figure_3.png} \\
+ \includegraphics[scale=0.35]{figures/Figure_4.png} &
+ \includegraphics[scale=0.35]{figures/Figure_5.png} &
+ \includegraphics[scale=0.35]{figures/Figure_6.png}
+\end{tabular}
+\caption{Time integrated relative L2 error between reference and HO solutions for values of various values of $N$ and $T$. First row: solver tolerance for both ref and HO solvers of $atol = rtol = 1e-10$ and second row for
+$atol = rtol = 1e-13$.
+}
+\label{fig_error_maps_odeint}
+\end{figure}
+
+
+
+\item This allows us conclude that the solutions of the HO phase averaged equations with exponential basis \eqref{exp_basis} converge for all values of $T >1 $ (up to the currently tested $T \approx 50$) to the solutions of the original modulated ODE.
+
+
+\item The key here is that we use the same time integrator for both reference and HO model, hence reducing the error difference purely to the difference between the original and the HO phase averaged ODEs. As mentioned above, odeint, to achieve the desired accuracy, needs to have much smaller integration steps which, if we did not proceed from here, this would make our endeavour so far pointless because we wanted to have large time steps in first place.
+
+\item In the next section, we test now the accuracy of our novel SDC solver for actually large time steps, that also feature substeps, but here they can be parallelized, providing us with the desired pathway for parallelization in time.
+
+
+\end{itemize}
+
+
+
+
+
+
+
+\subsection{Exporing the SDC method to obtain large time steps}
+
 
 
 
