@@ -354,7 +354,12 @@ block diagonalized (or lumped) system:
                     + \Delta t \left[ \sum_{\alpha=1}^{N_t} \omega_{\alpha,k}\Fu(\V^{j}_\alpha) \right],
 \vspace{-0.5em}
 \end{equation}
-where $j$ denotes the iteration index and $k$ the $N_t$ quadrature nodes of the SDC method with quadrature weights $\omega_{\alpha,k}$ \cite{Dutt2000} within the time interval $\Delta t = [t,t+1]$ and subintervals $\Delta t_k = [t_k,t_{k+1}]$. This ansatz indeed bypasses the requirement to invert $\M$ while it simultaneously discretizes time with an SDC approach.
+where $j$ denotes the iteration index and $k$ the $N_t$ quadrature nodes of the SDC method with quadrature weights $\omega_{\alpha,k}$ \cite{Dutt2000} within the time interval $\Delta t = [t,t+1]$ and subintervals $\Delta t_k = [t_k,t_{k+1}]$.
+
+\todo{Initialization of iteration of $j$, namely for $j=0$ we have $\V^{j+1}_{k=0} = \V^{j}_{k=0} = \V_n$
+\checkit{CHECK!!!}}
+
+This ansatz indeed bypasses the requirement to invert $\M$ while it simultaneously discretizes time with an SDC approach.
 In case we have convergence, i.e. $|\V^{j + 1}_{k} - \V^{j}_{k}| \leq \epsilon$, the third term on the RHS vanishes and we are left with an implicit system that is solved with an SDC method ($\forall k, \V^{}_{k}$ without superscript indicates a converged value):
 \vspace{-0.5em}
 \begin{equation}\label{sdc_unlumped}
@@ -364,21 +369,21 @@ In case we have convergence, i.e. $|\V^{j + 1}_{k} - \V^{j}_{k}| \leq \epsilon$,
 \end{equation}
 recalling $\M \V^{}_{k +1} = \D \V^{}_{k +1} + \N \V^{}_{k + 1} $. We refer to
 \eqref{sdc_unlumped} as an \emph{unlumped system}. Note that for only one quadrature node (i.e. for ${N_t}=1$ we have $k=0,k+1 = t+1, \alpha =1$, hence $\omega_{1,0} = 1$, ending up with an implicit Euler backward scheme.
-It is important to mention that the success of my work in \cite{Bauer22} was also based on the fact that HO solutions were reset at the end of each time step, i.e. $\V_k(t+1) =0, \forall k \neq 0$, which fully stabilized the solver. It is likely that this has to be done also in the case of PDEs.
+It is important to mention that the success of the work in \cite{Bauer22} was also based on the fact that HO solutions were reset at the end of each time step, i.e. $\V_k(t+1) =0, \forall k \neq 0$, which fully stabilized the solver. It is likely that this has to be done also in the case of PDEs.
 
 So far, no specific model has been assumed, we only specified a quadratic nonlinearity for the sake of a clearer representation but higher order nonlinearities would also fit in the theory. To proceed, however, we have to select a model ODE or PDE and find a concrete representation of \eqref{iter2sdc}.
 
 
 \section{Application of HO averaging technique to swinging spring}
 
-The above framework is independent of a selection of ODE or PDE. It is intended to be applicable for PDEs, especially the block diagonalization addresses the case of dense HO mass matrices in case of PDEs. Here, we want to explore if HO terms using a novel exponential basis, instead of a monomial one as done in BAUER, has beneficial properties on an example of the swinging spring, as also used therein.
+The above framework is independent of a selection of ODE or PDE. It is intended to be applicable for PDEs, especially the block diagonalization addresses the case of dense HO mass matrices in case of PDEs. Here, we want to explore if HO terms using a novel exponential basis, instead of a monomial one as done in \cite{Bauer22}, has beneficial properties on an example of the swinging spring, as also used therein.
 
-In this paper, we will compute the integrals of occuring in \eqref{hoavgpde} analytically, but the following methodology we are going to develop is equally valid if we used a numerical approximation as introduced in \eqref{hoavg_mtx}. Further, to ease the notation (and mimic those of BAUER 2022), we introduce the following expression of the nonlinear RHS terms, a form that is shared by the swinging spring model we use here. That, we assume that the nonlinearity (here quadratic in $\V$ can be written as
+In this paper, we will compute the integrals of occuring in \eqref{hoavgpde} analytically, but the following methodology we are going to develop is equally valid if we used a numerical approximation as introduced in \eqref{hoavg_mtx}. Further, to ease the notation (and mimic those of \cite{Bauer22}), we introduce the following expression of the nonlinear RHS terms, a form that is shared by the swinging spring model we use here. That, we assume that the nonlinearity (here quadratic in $\V$ can be written as
 \begin{equation}
  \sum_{\kappa} \Fu_{\kappa,l,m}(\V_l,\V_m) e^{i {(t + s) c_\kappa} }
   =   e^{-(t+s) \opL} \opN \left(e^{ (t+s) \opL}  {\V_{l}}(t), e^{ (t+s) \opL} {\V_{m}}(t)\right)
 \end{equation}
-which constitute of a sum over $\kappa$ of coefficients $ \Fu_{\kappa,l,m}(\V_l,\V_m)$ that depend quadratically on $\V$ and that are weighted with an exponential that depends on an additional parameter $c_\kappa$. The elaboration of this model in BAUER and the explicit representation of these coefficients in BAUER illustrates that this is a reasonable and useful way of writing the coordinate transformed (by $e^{-(t+s) \opL}$) nonlinear dynamics.
+which constitute of a sum over $\kappa$ of coefficients $ \Fu_{\kappa,l,m}(\V_l,\V_m)$ that depend quadratically on $\V$ and that are weighted with an exponential that depends on an additional parameter $c_\kappa$. The elaboration of this model in BAUER and the explicit representation of these coefficients in \cite{Bauer22} illustrates that this is a reasonable and useful way of writing the coordinate transformed (by $e^{-(t+s) \opL}$) nonlinear dynamics.
 
 Using the basis for trial and test function as discussed above, we arive at the expension:
 for $j = -N,..N$
@@ -444,323 +449,83 @@ The system \eqref{ho_avg_swingspring} can be cast in the matrix vector form \eqr
 \end{equation}
 or, more compact as $\M \pp{}{t}  \V = \mathbf{R}$ with the coefficients defined as in Proposition~\ref{prop_coeff}.
 \end{corollary}
+\todo{Define $\mathbf{R}$ if the compact form is useful.}
 \begin{proof}
  The formulation follows immediately from using the definitions of Proposition~\ref{prop_coeff}
  in \eqref{ho_avg_swingspring}.
 \end{proof}
 
 
-Next, we present an explicit representation of the system \eqref{swingspring_mtx} for $N =1$.
 
-
-
-
-
-
-
-
-
-\red\newpage
-
-
-
-
-{\checkit{Example:} explicit representation in exponential basis for $N = 1$: }
-
-Using $L = i \omega$ (see below), $\M$ can be expressed as
- \begin{equation}\notag
- \M^1 =
+Next, we present an explicit representation of the system \eqref{swingspring_mtx}.
+For $N = 1$ and $\opL = i \omega$ , the HO phase averaged equations for the swinging spring model read:
+\begin{equation}\notag
+ \begin{split}
+ &
  \begin{pmatrix}
  1 & e^{\frac{- \omega ^2 T^2}{2}}  & e^{\frac{- 4\omega ^2 T^2}{2}}  \\
  e^{\frac{- \omega ^2 T^2}{2}} & 1   & e^{\frac{- \omega ^2 T^2}{2}} \\
  e^{\frac{- 4\omega ^2 T^2}{2}}    & e^{\frac{- \omega ^2 T^2}{2}} & 1   \\
- \end{pmatrix}.
- \end{equation}
-The RHS can be written as vector:
- \begin{equation}\notag
- \tilde \R_{kl}^{1,m}  =
- \begin{pmatrix}
-  e^{\frac{(i {c_m} + (+1+k+l)L)^2 T^2}{2}}\\
-  e^{\frac{(i {c_m} + (0+k+l)L)^2 T^2}{2}}\\
-  e^{\frac{(i {c_m} + (-1+k+l)L)^2 T^2}{2}}\\
- \end{pmatrix}.
- \end{equation}
-
-
-
-This leads to the following matrix-vector equation:
-\begin{small}
- \begin{equation}\notag%\label{eqn_mass_2}
- \begin{split}\M^1
- \begin{pmatrix}
- \dot\V_{-1}(t)\\
- \dot\V_0(t)\\
- \dot\V_1(t)\\
-\end{pmatrix} =
- \sum_{m} \sum_{k,l = -N}^N  e^{ic_m t}
- \Fu_{m,k,l} (\V_k,\V_l)
- \begin{pmatrix}
-  e^{\frac{(i {c_m} + (+1+k+l)L)^2 T^2}{2}}\\
-  e^{\frac{(i {c_m} + (0+k+l)L)^2 T^2}{2}}\\
-  e^{\frac{(i {c_m} + (-1+k+l)L)^2 T^2}{2}}\\
  \end{pmatrix}
-.
-\end{split}
+ \begin{pmatrix}
+ \partial_t \V_{-1}(t)\\
+ \partial_t \V_0(t)\\
+ \partial_t \V_{+1}(t)\\
+ \end{pmatrix}
+  \hspace {0em} = \sum_{l,m = -N}^N  \sum_{\kappa} \ \Fu_{\kappa,l, m}(\V_l(t),\V_m(t)) e^{i {t c_\kappa} }
+ \begin{pmatrix}
+  e^{\frac{(i {c_\kappa} + (+1+l+m)\opL)^2 T^2}{2}}\\
+  e^{\frac{(i {c_\kappa} + (0+l+m)\opL)^2 T^2}{2}}\\
+  e^{\frac{(i {c_\kappa} + (-1+l+m)\opL)^2 T^2}{2}}\\
+ \end{pmatrix}.
+ \end{split}
 \end{equation}
-\end{small}
 
 
 
 
+\blue
+
+\section{Equations of the swinging spring}
+
+As mentioned, ...
 
 
-\paragraph{Model equations and full set of equations}
+
 
 Let's start with the model equations. They read as follows:
 
 
+\begin{scriptsize}
+\hspace*{-1em}\begin{tabular}{ l| l | l | l}
+   $c_m$ & $F^x_{m,k,l}$ &  $F^y_{m,k,l}$ & $F^z_{m,k,l}$   \\
+   \hline \vspace{-1em}\\
+  $c_1:= (\rho - 2)\omega_R$ & 0 & 0 & $F^z_{1,k,l} = c_z  (\hat X_{k} *\hat X_{l} + \hat Y_{k}*\hat Y_{l}) $ \\
+  $c_2:= \rho \omega_R$ & $F^x_{2,k,l} = c_{xy}  \hat X_k *\overline{\hat Z}_l $ & $F^y_{2,k,l} = c_{xy}  \hat Y_k *\overline{\hat Z}_l $ & $F^z_{2,k,l} = 2 c_z (\hat X_k *\overline{\hat X}_l + \hat Y_k * \overline{\hat Y}_l)$ \\
+  $c_3: =  (\rho + 2)\omega_R$ & $F^x_{3,k,l} = c_{xy}  \overline{\hat X}_k  *\overline{\hat Z}_l $ & $F^y_{3,k,l} = c_{xy}  \overline{\hat Y}_k  *\overline{\hat Z}_l $ &
+      $F^z_{3,k,l} = c_z   (\overline{\hat X}_k *\overline{\hat X}_l + \overline{\hat Y}_k * \overline{\hat Y}_l)$ \\
+  $c_4 := - \rho \omega_R$ &$F^x_{4,k,l} = c_{xy}  \hat X_k * \hat Z_l $ & $F^y_{4,k,l} = c_{xy}  \hat Y_k * \hat Z_l $ & 0 \\
+  $c_5 := -(\rho + 2)\omega_R$ & $F^x_{5,k,l} = c_{xy}  \overline{\hat X}_k *\hat Z_l $  & $F^y_{5,k,l} = c_{xy}  \overline{\hat Y}_k *\hat Z_l $ & 0 \\
+\end{tabular}
+\end{scriptsize}
+
+with coefficients $c_{xy} = 3  i  \omega_R\rho^2/16 $ and $c_z    = 3  i  \omega_R\rho/32$ (here $\rho = 2$).
+
+
+
+
+
+\todo{here we need to put some equations that describe the swinging spring ODE}
+
+\black
 
 
 
 \newpage
 
 
-
-
-
-
-\vspace{3em}
-
-
-
-
-% \subsection{Continuous, modulated equations}
-We consider initial value problems written in the following abstract
-form
-\begin{equation}\label{equ_gen_U}
- \pp{}{t} \U = L\U + N(\U ,\U ),
-\end{equation}
-where $L$ is a linear operator (with purely imaginary eigenvalues) and
-$N$ is a nonlinear operator.
-Restricting ourselves to quadratic nonlinearities, we assume
-$N$ to be a bilinear form (bilinearity indicated by the two slots).
-
-
-To apply phase averaging, we add an additional phase parameter $s \in
-\mathbbm{R}$ over which we integrate and hence average the solution.
-As a first step, we assume a factorization
- \begin{equation}\label{factoring_s}
- \V(t,s) = e^{-(t+s) L} \U(t)
-\end{equation}
-where, besides the time parameter $t$, we include a \emph{phase
-  parameter} $s\in \mathbbm{R}$ in the exponent such that the solution
-in $\V$ depends on both $t$ and $s$. The phase parameter $s$
-corresponds to a change in the point where the exponential
-$\exp((t+s)L)$ is equal to the identity, i.e. a phase shift.
-This leads to an equation of the form
-\begin{equation}\label{equ_gen_V_s}
-   \pp{}{t} \V(t,s) = e^{-(t+s) L} N \left(e^{ (t+s) L} \V(t,s),e^{ (t+s) L} \V(t,s)\right).
-\end{equation}
-This gives us a one parameter family of solutions $\V(t,s)$ that
-depend on the phase parameter $s$ with the property that for $s = 0$
-we recover the solution of standard phase averaging, see e.g. Hiroe/Cotter 2022.
-
-For finite Rossby number, \citet{haut2014asymptotic} proposed to adapt
-phase averaging to be used for numerical computations by keeping $T$ finite and introducing a
- $C^\infty$ weight function $\rho$ with $\rho\geq 0$, $\|\rho\|_{L^1}=1$, to obtain the averaged equation
- \begin{equation}
-   \label{equ_gen_V_int}
-   \pp{}{t} \bar{\V}(t) = \int_{-\infty}^{\infty}
-   \rho_T\left(s\right)e^{-(t+s) L} N \left(e^{ (t+s) L}
-   \bar{\V}(t,s),e^{ (t+s) L} \bar{\V}(t,s)\right) \diff s,
- \end{equation}
- where $\rho_T(s)=\rho(s/T)/T$. They further proposed to replace the
- integral via quadrature (choosing $\rho$ to have compact support),
- with the evaluation of the integrand at each quadrature point being
- computed independently in parallel; this formulation provided the
- coarse propagator for a parallel-in-time algorithm. The
- reason for the phase averaging in that paper, and this one, is to
- remove high oscillations from the modulated variable, allowing
- larger timesteps to be taken in a numerical solver. This averaging
- introduces an error in the solution, and the goal of this paper is
- to introduce refinements to the phase averaging procedure so that
- this error can be reduced.
-
-
-
-
-\vspace{5em}
-\red
-
-
-
-
-We assume that the $s$ dependency in $\V$ is as follows:
-\begin{equation}\label{eqn_vel_split}
-  \V(t,s) = \sum_{k = -N}^N \phi_k(s) \V_k(t)  = \sum_{k = -N}^N e^{kLs} \V_k(t) , 
-\end{equation} 
-
-
-
-
-The next equation is now a projection of \eqref{equ_gen_V_s} onto this expansion \eqref{eqn_vel_split}.
-(i.e. in the HO paper, we called this space ???). The inner product we used for this projection is the 
-integral with the integration kernel we used in HO paper.
-
-The full expansion looks like that: We project onto $Q$ to obtain (basis independent formulation)
-\begin{equation}
- \int_{-\infty}^{\infty} 
- \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
- \langle \W(s) , \pp{}{t}  \V(t,s) \rangle ds 
- =  \int_{-\infty}^{\infty} 
-     \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
- \langle \W(s) , e^{-(t+s) L} N \left(e^{ (t+s) L} {\V}(t,s), e^{ (t+s) L} {\V}(t,s)\right) \rangle \diff s,
- \quad \forall \W(s)\in Q,
- \end{equation}
-where
-\begin{equation}
- \W(s)  = \sum_{j = -N}^N \phi_j(s) \W_j   = \sum_{j = -N}^N  e^{jLs}  \W_j   ,
-\end{equation}
  
  
- 
-And case $N=0$ recovers the orignal averaged equations like:
-\begin{equation}
-   \label{equ_gen_V_int}
-   \pp{}{t} {\V_0}(t) = 
-   \int_{-\infty}^{\infty} 
-    \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
-e^{-(t+s) L} N \left(e^{ (t+s) L} {\V_0}(t), e^{ (t+s) L} {\V_0}(t)\right) \diff s,
- \end{equation}
-is like the basic average (assuming V is indenpendet of $s$.)
-We assume quadratic nonlinearity, so terms in N will have two indices $l,m$. 
-
-For all $\W_j, j = -N,...N$:
-\begin{align*}
-\sum_{k=-N}^{N} \int_{-\infty}^{\infty} 
- \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
- & \langle {\phi_j}(s) \W_j, \phi_k(s) \pp{}{t}  \V_k(t) \rangle ds
-  =  \int_{-\infty}^{\infty} 
-     \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
- \langle {\phi_j}(s) \W_j,  e^{-(t+s) L} N \left(e^{ (t+s) L} {\V}(t,s), e^{ (t+s) L} {\V}(t,s)\right) \rangle ds \\
- & = \sum_{l,m =-N}^{N}  \int_{-\infty}^{\infty} 
-     \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
- \langle {\phi_j}(s) \W_j, \phi_l(s) \phi_m(s) e^{-(t+s) L} N \left(e^{ (t+s) L}  {\V_l}(t), e^{ (t+s) L} {\V_m}(t)\right) \rangle ds   
- \end{align*}
-
- Expand in exponential basis! For all $\W_j, j = -N,...N$:
-\begin{align*}
-\sum_{k=-N}^{N} \int_{-\infty}^{\infty} 
-&  \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
-  \langle \W_j , e^{(-j+k)Ls}  \pp{}{t}  \V_k(t) \rangle ds \\
- & = \sum_{l,m =-N}^{N}  \int_{-\infty}^{\infty} 
-     \frac{e^{-\frac{s^2}{2T^2}}}{\sqrt{2\pi T^2}}  
- \langle \W_j, e^{(-j+l+m)Ls}   
- e^{-(t+s) L} N \left(e^{ (t+s) L}  {\V_l}(t), e^{ (t+s) L} {\V_m}(t)\right) \rangle ds   
- \end{align*}
- 
- 
- \begin{itemize}
-  \item Formulate $\M_{jk}$ and $\Fu_{j}$
-  \[
-   \M_{jk} \dot \V_k (t) =  \Fu_{jlm} (\V_l, \V_m)
-   \]
-  \item We don't want to formulate the full matrix $\M$
-  \item Split $\M$ into diagonal $\D$ and nondiagonal $\N$
-  \item Use SDCM like ansatz: $i$ iteration index, $\tau$ integration points, 
-  $\alpha$ higher order correction points with weights $\omega$
-  \[
-   \D \V^{i +1}_{\tau +1} =  \M \V^{i +1}_{\tau} \
-                    + \Delta t_\tau \left[ \Fu(\V^{i+1}_\tau) - \Fu(\V^{i}_\tau)\right]
-                    - \N \V^{i}_{\tau +1}
-                    + \Delta t_\tau \left[ \sum_{\alpha=1}^4 \omega_{\alpha,\tau}\Fu(\V^{i}_\alpha) \right]
-  \]
- \item Initialization with $\V^{i = 0}_{\tau =0 } = \V_n = \V^{i = 0}_{\tau = 1 }$ \checkit{WHAT ELSE???}
- \item \checkit{HOW DO WE DO THE ALGORITHM???}
- \item \checkit{HOW DO WE MERGE THIS WITH HO METHOD FROM ABOVE???}
- \item \checkit{LET'S FIRST USE ONLY M AND MERGE WITH HO METHOD, THEN DO SPLIT
- \[
-   \M \V^{i +1}_{\tau +1} =  \M \V^{i +1}_{\tau} \
-                    + \Delta t_\tau \left[ \Fu(\V^{i+1}_\tau) - \Fu(\V^{i}_\tau)\right]
-                    + \Delta t_\tau \left[ \sum_{\alpha=1}^4 \omega_{\alpha,\tau}\Fu(\V^{i}_\alpha) \right]
-  \]
-  }
-  
-  
- \end{itemize}
-
- 
-  
- 
- 
- 
- 
- 
- \newpage
- 
- 
- 
- \bigskip
- 
- 
- \color{blue}
- 
- 
- 
- 
- 
- We study first the integral on the LHS. We define
- \begin{equation}\label{def_massmtx_exp}
-  \M^1_{jk}  = \frac{1}{\sqrt{2\pi T^2}}\int_{-\infty}^\infty e^{-\frac{s^2}{2T^2}}  e^{(-j+k)Ls}  ds  . 
- \end{equation}
- Introducing a general variable $\beta$, the completion of the square reads:
- \[
- -\frac{s^2}{2T^2} + \beta s =     - \frac{1}{2T^2} (s - \beta T^2)^2 + \frac{\beta^2 T^2}{2}  
- \]
- This allows us to reformulate~\eqref{def_massmtx_exp} using $\beta_{jk} := (-j+k)L$, yielding 
- \begin{equation}\label{def_massmtx_exp1}
-  \M^1_{jk}  = e^{\frac{\beta_{jk}^2T^2}{2}}\frac{1}{\sqrt{2\pi T^2}}\int_{-\infty}^\infty 
-  e^{- \frac{1}{2T^2} (s - \beta_{jk} T^2)^2} ds   .
- \end{equation}
- We use the substitution $s' = s - \beta_{jk} T^2$ with $ds' = ds$ and result in
- \begin{equation}\label{def_massmtx_exp2}
-  \M^1_{jk}  = e^{\frac{\beta_{jk}^2T^2}{2}}\frac{1}{\sqrt{2\pi T^2}}\int_{-\infty-\beta_{jk} T^2}^{\infty-\beta_{jk} T^2} 
-  e^{- \frac{1}{2T^2} (s')^2} ds'   
- \end{equation}
-  With $L$ being complex, the same argument as in our HO paper holds and we can rewrite the former equation 
- as 
-\begin{equation}\label{def_massmtx_exp3}
-  \M^1_{jk}  = e^{\frac{\beta_{jk}^2T^2}{2}}\frac{1}{\sqrt{2\pi T^2}}\int_{-\infty }^{\infty } 
-  e^{- \frac{1}{2T^2} (s)^2} ds   =  e^{\frac{\beta_{jk}^2T^2}{2}}
-  = e^{\frac{\beta_{jk}^2T^2}{2}}
- \end{equation}
- using $s$ instead of $s'$ and the normalization property we use for the integration kernel.
- 
- \bigskip
- 
- 
- Let us next consider the RHS, which is in fact a vector with elements $j$: 
- 
- \begin{align*}
-RHS_j &  = \frac{1}{\sqrt{2\pi T^2}} \sum_{l,m =-N}^{N}  \int_{-\infty}^{\infty} 
-     {e^{-\frac{s^2}{2T^2}}}  
- e^{(-j+l+m)L \, s} 
- e^{-(t+s) L} N \left(e^{ (t+s) L}  {\V_l}(t), e^{ (t+s) L} {\V_m}(t)\right) ds   \\
-&  = \frac{e^{- t L}}{\sqrt{2\pi T^2}} \sum_{l,m =-N}^{N}  \int_{-\infty}^{\infty} 
-     {e^{-\frac{s^2}{2T^2}}} e^{(-j+l+m - 1)L \, s}  
- N \left(e^{ (t+s) L}  {\V_l}(t), e^{ (t+s) L} {\V_m}(t)\right) ds   \\
-\end{align*}
-
-\color{red}
-How does the swinging spring look like in this form of HO averaged equations?
-
- 
- 
-\bigskip
-
-
-\black
-
 
 \section{Numerical results}
 
